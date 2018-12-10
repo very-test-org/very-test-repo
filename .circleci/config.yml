@@ -1,13 +1,37 @@
 version: 2
 
-jobs:
-  build:
-    docker:
-      - image: alpine:latest
-    steps:
-      - run: env
-      - run: mkdir sample_dir && echo "sample file" > sample_dir/file.txt
-      - store_artifacts:
-          path: sample_dir
-          destination: random_prefix
+workflows:
+  version: 2
+  testing:
+    jobs:
+      - save
+      - wait:
+          requires: [save]
+      - load:
+          requires: [wait]
 
+jobs:
+  save:
+    docker:
+      - image: circleci/golang
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: |
+          docker pull circleci/openjdk
+  wait:
+    docker:
+      - image: circleci/golang
+    steps:
+      - run: |
+          # Give vm-service some time to detach and unmount the volume
+          sleep 60
+  load:
+    docker:
+      - image: circleci/golang
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: |
+          # We expect to see the image we pulled in the save job
+          docker image ls
