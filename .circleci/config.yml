@@ -6,3 +6,8 @@ jobs:
       - image: alpine:latest
     steps:
       - run: env
+      - run: mkdir sample_dir && echo "sample file" > sample_dir/file.txt
+      - store_artifacts:
+          path: sample_dir
+          destination: random_prefix
+
