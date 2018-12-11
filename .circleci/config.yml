@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: alpine:latest
+      - image: circleci/python:latest
     steps:
       - run: env
       - run: mkdir sample_dir && echo "sample file" > sample_dir/file.txt
